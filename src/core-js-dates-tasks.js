@@ -265,8 +265,41 @@ function getQuarter(date) {
  * { start: '01-01-2024', end: '15-01-2024' }, 1, 3 => ['01-01-2024', '05-01-2024', '09-01-2024', '13-01-2024']
  * { start: '01-01-2024', end: '10-01-2024' }, 1, 1 => ['01-01-2024', '03-01-2024', '05-01-2024', '07-01-2024', '09-01-2024']
  */
-function getWorkSchedule(/* period, countWorkDays, countOffDays */) {
-  throw new Error('Not implemented');
+function getWorkSchedule(period, countWorkDays, countOffDays) {
+  const startArr = period.start.split('-');
+  const endArr = period.end.split('-');
+  const start = new Date(startArr[2], startArr[1] - 1, startArr[0]);
+  const end = new Date(endArr[2], endArr[1] - 1, endArr[0]);
+  const schedule = [];
+  const currentDate = new Date(start);
+  let isWorkingDay = true;
+
+  while (currentDate <= end) {
+    if (isWorkingDay) {
+      for (let i = 0; i < countWorkDays; i += 1) {
+        if (currentDate <= end) {
+          currentDate.toLocaleDateString('en-US', {
+            month: '2-digit',
+            day: '2-digit',
+            year: 'numeric',
+          });
+          const day = String(currentDate.getDate()).padStart(2, '0');
+          const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+          const year = currentDate.getFullYear();
+          schedule.push(`${day}-${month}-${year}`);
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      }
+    } else {
+      for (let i = 0; i < countOffDays; i += 1) {
+        if (currentDate <= end) {
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      }
+    }
+    isWorkingDay = !isWorkingDay;
+  }
+  return schedule;
 }
 
 /**
